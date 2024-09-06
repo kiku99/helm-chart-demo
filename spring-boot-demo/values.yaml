@@ -1,0 +1,21 @@
+replicaCount: 1
+
+image:
+  repository: kiku99/spring-boot-demo
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "500m"
+  limits:
+    memory: "1Gi"
+    cpu: "1"
+
+env:
+  SPRING_PROFILES_ACTIVE: "dev"
