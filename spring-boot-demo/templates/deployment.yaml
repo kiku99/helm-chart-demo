@@ -22,6 +22,9 @@ spec:
       containers:
         - name: {{ .Release.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          volumeMounts:
+            - name: tmp-volume
+              mountPath: /tmp
           ports:
             - containerPort: 8080
           env:
@@ -42,4 +45,7 @@ spec:
             capabilities:
               drop:
                 - ALL
+      volumes:
+        - name: tmp-volume
+          emptyDir: {}
 
