@@ -1,3 +1,5 @@
+replicaCount: 1
+
 image:
   repository: mysql
   tag: "8.0"
@@ -16,10 +18,13 @@ resources:
     cpu: "1"
 
 mysql:
-  user: "myuser"
+  database: "demo"
+  host: "localhost"
+
+secrets:
+  user: "myuser"  # Plain text in values.yaml but will be converted to Secret
   password: "mypassword"
   rootPassword: "rootpassword"
-  database: "mydatabase"
 
 persistence:
   enabled: true
