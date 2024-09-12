@@ -1,0 +1,46 @@
+image:
+  repository: mysql
+  tag: "8.0"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 3306
+
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "500m"
+  limits:
+    memory: "1Gi"
+    cpu: "1"
+
+mysql:
+  user: "myuser"
+  password: "mypassword"
+  rootPassword: "rootpassword"
+  database: "mydatabase"
+
+persistence:
+  enabled: true
+  accessMode: ReadWriteOnce
+  size: 1Gi
+  storageClass: "standard"
+
+livenessProbe:
+  exec:
+    command:
+      - /bin/sh
+      - -c
+      - mysqladmin ping -h localhost
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+readinessProbe:
+  exec:
+    command:
+      - /bin/sh
+      - -c
+      - mysqladmin ping -h localhost
+  initialDelaySeconds: 30
+  periodSeconds: 10
