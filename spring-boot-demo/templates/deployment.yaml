@@ -6,6 +6,9 @@ metadata:
     app: {{ .Release.Name }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  strategy:
+    {{- toYaml .Values.rollout.strategy | nindent 4 }}
+
   selector:
     matchLabels:
       app: {{ .Release.Name }}
@@ -14,6 +17,8 @@ spec:
       labels:
         app: {{ .Release.Name }}
     spec:
+      securityContext:
+        fsGroup: {{ .Values.securityContext.fsGroup }}
       containers:
         - name: {{ .Release.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -29,3 +34,12 @@ spec:
             limits:
               memory: "{{ .Values.resources.limits.memory }}"
               cpu: "{{ .Values.resources.limits.cpu }}"
+          securityContext: 
+            runAsUser: {{.Values.securityContext.runAsUser}}
+            runAsGroup: {{.Values.securityContext.runAsGroup}}
+            allowPrivilegeEscalation: {{.Values.securityContext.allowPrivilegeEscalation}}
+            readOnlyRootFilesystem: {{.Values.securityContext.readOnlyRootFilesystem}}
+            capabilities:
+              drop:
+                - ALL
+

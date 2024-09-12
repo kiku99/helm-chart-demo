@@ -1,4 +1,4 @@
-replicaCount: 1
+replicaCount: 3
 
 image:
   repository: kiku99/spring-boot-demo
@@ -8,6 +8,13 @@ image:
 service:
   type: ClusterIP
   port: 80
+
+rollout:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 0
 
 resources:
   requests:
@@ -19,3 +26,13 @@ resources:
 
 env:
   SPRING_PROFILES_ACTIVE: "dev"
+
+securityContext:
+  runAsUser: 1000                # 사용자 ID
+  runAsGroup: 3000               # 그룹 ID
+  fsGroup: 2000                  # 파일 시스템 그룹
+  allowPrivilegeEscalation: false # 권한 상승 방지
+  readOnlyRootFilesystem: true   # 루트 파일 시스템 읽기 전용
+  capabilities:
+    drop:
+      - ALL                      # 모든 권한 제거
