@@ -22,6 +22,7 @@ mysql:
   host: "localhost"
 
 secrets:
+  secretName: "mysql-secret"
   user: "myuser"  # Plain text in values.yaml but will be converted to Secret
   password: "mypassword"
   rootPassword: "rootpassword"

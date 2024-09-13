@@ -33,17 +33,17 @@ spec:
         - name: MYSQL_USER
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.secrets.userSecretName }}
+              name: {{ .Values.secrets.secretName }}
               key: username
         - name: MYSQL_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.secrets.userSecretName }}
+              name: {{ .Values.secrets.secretName }}
               key: password
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ .Values.secrets.rootSecretName }}
+              name: {{ .Values.secrets.secretName }}
               key: rootPassword
         livenessProbe:
           exec:
