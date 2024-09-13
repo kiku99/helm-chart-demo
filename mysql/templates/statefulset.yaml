@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-mysql
+  labels:
+    app.kubernetes.io/name: mysql
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion }}
+    app.kubernetes.io/managed-by: Helm
+spec:
+  serviceName: {{ .Release.Name }}-mysql  # Headless Service 이름
+  replicas: {{ .Values.replicaCount }}  # 복제본 수 설정
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mysql
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mysql
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: mysql
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: 3306
+          name: mysql
+        env:
+        - name: MYSQL_DATABASE
+          value: {{ .Values.mysql.database }}
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secrets.userSecretName }}
+              key: username
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secrets.userSecretName }}
+              key: password
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secrets.rootSecretName }}
+              key: rootPassword
+        livenessProbe:
+          exec:
+            command:
+              - /bin/sh
+              - -c
+              - "mysqladmin ping -u root -p${MYSQL_ROOT_PASSWORD} || exit 1"
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+              - /bin/sh
+              - -c
+              - "mysqladmin ping -u root -p${MYSQL_ROOT_PASSWORD} || exit 1"
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        resources:
+          requests:
+            memory: {{ .Values.resources.requests.memory }}
+            cpu: {{ .Values.resources.requests.cpu }}
+          limits:
+            memory: {{ .Values.resources.limits.memory }}
+            cpu: {{ .Values.resources.limits.cpu }}
+        volumeMounts:
+        - name: mysql-data
+          mountPath: /var/lib/mysql  # MySQL 데이터 디렉토리 마운트
+  volumeClaimTemplates:
+  - metadata:
+      name: mysql-data
+      labels:
+        app.kubernetes.io/name: mysql
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ .Values.persistence.size }}  # 스토리지 사이즈
+      storageClassName: {{ .Values.persistence.storageClass }}  # 스토리지 클래스
